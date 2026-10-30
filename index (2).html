@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CALCSPACE</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: kartu putih bersudut bulat di atas latar biru muda; judul dua baris (navy dan biru) dengan garis hijau, seperti slide proyek. Satu tema terang. */
+:root{
+  --bg1:#DDE8FF; --bg2:#F7F9FF; --hdr:#EEF3FF; --ink:#0B1B4D; --ink2:#16264F; --muted:#3B4A73;
+  --blue:#1747D6; --blue-deep:#1238A6; --green:#22B35A; --green-ink:#14803F; --card:#FCFDFF; --line:#D5DDEA; --soft:#E9F0FF;
+  --bad:#C2410C; --warn:#9A5B00; --grid:#E3E9F5; --axis:#8FA3D6;
+  --font:'Poppins','Trebuchet MS',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background-color:var(--bg2);background-image:linear-gradient(135deg,var(--bg1),var(--bg2));background-attachment:fixed;color:var(--ink);font:400 16px/1.6 var(--font);padding-inline:16px;padding-block:0 56px;min-height:100%}
+h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.wrap{max-width:1040px;margin-inline:auto}
+.lab{font:600 .78rem/1.2 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;justify-content:center;min-width:56px;height:40px;padding-inline:12px;background:var(--blue);color:#fff;font:700 1.05rem/1 var(--font);border-radius:6px}
+
+/* shell: sidebar + konten, gaya dasbor belajar */
+.shell{max-width:1320px;margin:20px auto;display:grid;grid-template-columns:232px minmax(0,1fr);gap:20px;background:rgba(255,255,255,.62);border:1px solid #fff;border-radius:28px;box-shadow:0 18px 50px rgba(23,71,214,.12);padding:16px}
+.side{position:sticky;top:16px;align-self:start;background:var(--card);border-radius:20px;padding:18px 14px;display:flex;flex-direction:column;gap:18px;min-height:calc(100vh - 72px);box-shadow:0 6px 20px rgba(23,71,214,.06)}
+.brand{font:800 1.15rem/1 var(--font);letter-spacing:-.01em;display:flex;align-items:center;gap:10px;padding:2px 8px}
+.brand i{width:28px;height:28px;border-radius:9px;background:var(--blue);position:relative;display:inline-block;flex:none}
+.brand i::after{content:"";position:absolute;left:8px;top:8px;width:12px;height:12px;border-radius:50%;background:var(--green)}
+nav{display:flex;flex-direction:column;gap:4px}
+nav button{display:flex;align-items:center;gap:12px;border:0;background:none;padding:11px 12px;border-radius:12px;font-weight:500;color:var(--muted);text-align:left;position:relative}
+nav button svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav button:hover{background:var(--soft)}
+nav button[aria-current="page"]{background:var(--soft);color:var(--blue);font-weight:700}
+nav button[aria-current="page"]::before{content:"";position:absolute;left:-14px;top:8px;bottom:8px;width:4px;border-radius:0 4px 4px 0;background:var(--blue)}
+.sidecard{margin-top:auto;background:linear-gradient(140deg,#EAF0FF,#DCE8FF);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.sidecard b{font-size:.95rem}
+.content{min-width:0;display:flex;flex-direction:column;gap:20px;padding:4px 4px 8px}
+.topbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.search{position:relative;flex:1 1 220px;max-width:440px}
+.search input[type=text]{padding-left:42px;border-radius:14px;border-color:transparent;box-shadow:0 4px 14px rgba(23,71,214,.07)}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round}
+.sres{position:absolute;top:100%;left:0;right:0;margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(23,71,214,.16);z-index:20;overflow:hidden}
+.sres button{display:block;width:100%;text-align:left;border:0;background:none;padding:11px 14px;border-bottom:1px solid var(--line)}
+.sres button:last-child{border:0}
+.sres button:hover{background:var(--soft)}
+.sres small{display:block;color:var(--muted)}
+.who{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.9rem;min-width:0}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.who b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+.role{font:600 .72rem/1 var(--font);letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;background:var(--ink);color:#fff}
+.role.g{background:var(--green-ink)}
+.link{background:none;border:0;color:var(--blue);font-weight:600;padding:6px;text-decoration:underline}
+main{display:flex;flex-direction:column;gap:24px;min-width:0}
+.view{display:flex;flex-direction:column;gap:24px}
+
+/* banner dan beranda */
+.banner{position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(120deg,#1238A6 0%,#1747D6 45%,#4F86FF 100%);color:#fff;padding:30px 30px;display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;box-shadow:0 12px 30px rgba(23,71,214,.28)}
+.banner::before{content:"";position:absolute;right:-60px;bottom:-110px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.10)}
+.banner::after{content:"";position:absolute;left:38%;top:-80px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.07)}
+.bt{position:relative;z-index:1;flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.bt h1{font-size:clamp(1.6rem,4.6vw,2.3rem);font-weight:800;letter-spacing:-.01em}
+.bt p{color:#E3ECFF;max-width:46ch}
+.ba{position:relative;z-index:1;flex:0 1 260px;margin-inline:auto;min-width:0}
+.ba svg{display:block;width:100%;height:auto}
+.btn.light{background:#fff;border-color:#fff;color:var(--blue);align-self:flex-start}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+.rail{display:flex;flex-direction:column;gap:20px;min-width:0}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.mc{text-align:left;border:1px solid var(--line);background:var(--card);border-radius:18px;padding:10px;display:flex;flex-direction:column;gap:10px;min-width:0;box-shadow:0 6px 18px rgba(23,71,214,.07)}
+.mc:hover{border-color:var(--blue)}
+.th{display:block;border-radius:12px;overflow:hidden;line-height:0}
+.th svg{display:block;width:100%;height:auto}
+.mt{display:flex;flex-direction:column;gap:5px;padding:0 4px 4px;min-width:0}
+.mt b{font-size:.98rem;line-height:1.25}
+.mp{font-size:.82rem;color:var(--muted);line-height:1.4}
+.sh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sh h2{font-size:1.2rem}
+.rrow{display:flex;flex-direction:column;gap:6px}
+.rrow .top{display:flex;justify-content:space-between;font-size:.88rem}
+.lrow{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.lrow:last-child{border:0}
+.lrow .ico{width:40px;height:40px}
+.lrow .ico svg{width:20px;height:20px}
+.lrow .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.lrow .tx b{font-size:.9rem;line-height:1.25}
+.lrow .tx small{color:var(--muted)}
+.mini{border:0;background:var(--blue);color:#fff;border-radius:10px;padding:7px 12px;font-weight:600;font-size:.8rem}
+.h2l{font-size:clamp(2rem,6.4vw,3.4rem);font-weight:800;letter-spacing:-.02em;line-height:1.05;text-transform:uppercase}
+.h2l span{color:var(--blue)}
+.uline{width:84px;height:6px;border-radius:3px;background:var(--green)}
+.bar2{height:12px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar2>b{display:block;height:100%;background:var(--blue);border-radius:999px;transition:width .4s}
+@media (prefers-reduced-motion:reduce){.bar2>b{transition:none}}
+.wave{position:absolute;left:0;bottom:0;width:180px;height:auto;pointer-events:none}
+@media (max-width:1060px){.cols{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:860px){
+  body{padding-inline:10px;padding-bottom:84px}
+  .shell{display:block;margin:10px auto;padding:12px;border-radius:22px}
+  .side{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:30;min-height:0;border-radius:18px 18px 0 0;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));flex-direction:row;box-shadow:0 -6px 24px rgba(23,71,214,.16)}
+  .side .brand,.sidecard{display:none}
+  nav{flex-direction:row;width:100%;justify-content:space-around}
+  nav button{flex-direction:column;gap:3px;padding:6px 10px;font-size:.72rem;border-radius:10px;flex:1;align-items:center;text-align:center}
+  nav button[aria-current="page"]::before{display:none}
+  .content{gap:16px}
+  .banner{padding:22px 20px}
+}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.card{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;gap:14px;align-items:flex-start;min-width:0;box-shadow:0 6px 20px rgba(23,71,214,.07)}
+button.card:hover{border-color:var(--blue)}
+.ico{flex:none;width:52px;height:52px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center}
+.ico.g{background:var(--green)}
+.ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card .tx{display:flex;flex-direction:column;gap:6px;min-width:0}
+.card h3{font-size:1.02rem}
+.card p{font-size:.88rem;color:var(--muted);line-height:1.45}
+.pill{display:inline-block;font:600 .72rem/1 var(--font);padding:5px 9px;border-radius:999px;border:1.5px solid var(--line);color:var(--muted);align-self:flex-start}
+.pill.ok{color:var(--green-ink);border-color:var(--green)}
+.pill.warn{color:var(--warn);border-color:var(--warn)}
+.pill.bad{color:var(--bad);border-color:var(--bad)}
+.sec-t{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+
+/* sub-materi */
+.head{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.head h2{font-size:clamp(1.5rem,4.6vw,2.1rem);font-weight:800;letter-spacing:-.01em}
+.subtabs{display:flex;gap:8px;flex-wrap:wrap}
+.subtabs button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;font-weight:600;font-size:.9rem}
+.subtabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.prose{display:flex;flex-direction:column;gap:14px;max-width:68ch}
+.goal{background:var(--soft);border-left:5px solid var(--green);padding:10px 14px;border-radius:0 10px 10px 0;max-width:68ch}
+.formula{font:500 1rem/1.5 var(--mono);background:var(--soft);border-radius:10px;padding:12px 14px;overflow-x:auto;max-width:68ch}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0;box-shadow:0 6px 20px rgba(23,71,214,.07)}
+.panel h3{font-size:1.15rem}
+.ctl-row{display:flex;flex-wrap:wrap;gap:14px 24px}
+.ctl-row>*{flex:1 1 220px;min-width:0}
+.ctl{display:flex;flex-direction:column;gap:6px}
+input[type=range]{width:100%;accent-color:var(--blue);height:32px}
+select,input[type=text]{font:inherit;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;max-width:100%;width:100%}
+.plot{display:block;width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:12px;touch-action:pan-y}
+.gl{stroke:var(--grid);stroke-width:1}
+.ax{stroke:var(--axis);stroke-width:1.5}
+.cv{fill:none;stroke:var(--ink);stroke-width:2.5}
+.cv2{fill:none;stroke:var(--blue);stroke-width:2.5}
+.sec{stroke:var(--ink);stroke-width:2.5;fill:none}
+.tan{stroke:var(--green);stroke-width:2.5;stroke-dasharray:6 4;fill:none}
+.tl{fill:var(--muted);font:10px var(--mono)}
+.pt{fill:var(--ink);stroke:#fff;stroke-width:2}
+.pt2{fill:var(--green);stroke:#fff;stroke-width:2}
+.pt3{fill:#fff;stroke:var(--blue);stroke-width:3}
+.hole{fill:#fff;stroke:var(--ink);stroke-width:2}
+.guide{stroke:var(--blue);stroke-width:1;stroke-dasharray:3 3}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.readout div{background:var(--soft);border-radius:10px;padding:10px 12px;min-width:0}
+.readout b{display:block;font:500 1.05rem var(--mono);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.note{background:var(--soft);border-left:5px solid var(--blue);padding:10px 14px;border-radius:0 10px 10px 0}
+.legend{font-size:.85rem;color:var(--muted)}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font:600 .72rem var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num,th.num{text-align:right;font-family:var(--mono)}
+td.wrapt{white-space:normal;min-width:220px}
+.steps{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.steps li[hidden]{display:none}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.btn{border:2px solid var(--ink);background:transparent;border-radius:10px;padding:10px 18px;font-weight:600}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.q{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:14px;margin:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.q legend{font-weight:600;padding:0 6px;max-width:100%}
+.opt{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;min-height:44px}
+.opt input{accent-color:var(--blue);width:18px;height:18px;flex:none}
+.opt.right{border-color:var(--green);background:var(--soft)}
+.opt.wrong{border-color:var(--bad)}
+.fb{font-size:.92rem;color:var(--muted)}
+.score{font:800 2.4rem/1 var(--font);color:var(--blue)}
+.qwrap{display:flex;flex-direction:column;gap:12px}
+
+/* guru */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tile b{font:800 2rem/1 var(--font);font-variant-numeric:tabular-nums}
+.hbar{display:grid;grid-template-columns:64px 1fr 48px;gap:10px;align-items:center}
+.hbar .bar2{height:14px;border-radius:5px}
+.hbar .bar2>b{border-radius:5px}
+.hbar .bar2>b.low{background:var(--bad)}
+.sw{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.sw:last-child{border:0}
+.tg{appearance:none;width:48px;height:28px;border-radius:999px;background:var(--line);position:relative;border:0;flex:none;cursor:pointer}
+.tg::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+.tg[aria-checked="true"]{background:var(--blue)}
+.tg[aria-checked="true"]::after{left:23px}
+.ex{font:600 .72rem var(--font);letter-spacing:.06em;color:var(--warn);border:1.5px dashed var(--warn);padding:5px 9px;border-radius:8px;align-self:flex-start}
+
+/* login */
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding-block:32px}
+.login-card{position:relative;overflow:hidden;width:100%;max-width:460px;background:var(--card);border-radius:20px;box-shadow:0 12px 36px rgba(23,71,214,.14);padding:32px 28px;display:flex;flex-direction:column;gap:16px}
+.login-card>*:not(.wave){position:relative;z-index:1}
+.login-card .wave{z-index:0}
+.err{color:var(--bad);font-size:.9rem;font-weight:600}
+.fine{font-size:.85rem;color:var(--muted)}
+footer{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+
+
+<section class="login" id="login" hidden>
+  <div class="login-card">
+    <svg class="wave" viewBox="0 0 180 80" aria-hidden="true"><path d="M0 18 C40 18 62 40 90 56 C116 71 146 70 180 74 L180 80 L0 80 Z" fill="#1238A6"/><path d="M0 10 C42 10 66 32 95 48 C122 63 150 60 180 64" fill="none" stroke="#2F6BFF" stroke-width="4" stroke-linecap="round"/></svg>
+    <span class="chip" style="align-self:flex-start">CS</span>
+    <div>
+      <h1 class="h2l" style="font-size:2.4rem">CALC<span>SPACE</span></h1>
+      <p class="lab" style="margin-top:6px">Calculus Learning Space</p>
+    </div>
+    <div class="uline"></div>
+    <p>Belajar limit dan turunan lewat widget interaktif, contoh langkah demi langkah, latihan, dan kuis.</p>
+    <div>
+      <label class="lab" for="nm">Nama</label>
+      <input id="nm" type="text" maxlength="40" autocomplete="off" placeholder="Contoh: Aulia Rahma" style="margin-top:6px">
+      <p class="err" id="nm-err" hidden style="margin-top:8px">Isi nama dulu sebelum masuk.</p>
+    </div>
+    <div class="btns">
+      <button class="btn primary" id="in-s" type="button">Masuk sebagai siswa</button>
+      <button class="btn" id="in-g" type="button">Masuk sebagai guru</button>
+    </div>
+  </div>
+</section>
+
+<div class="shell" id="shell" hidden>
+  <aside class="side">
+    <div class="brand"><i></i>CALCSPACE</div>
+    <nav id="nav" aria-label="Menu"></nav>
+    <div class="sidecard" id="sidecard"></div>
+  </aside>
+  <div class="content">
+    <div class="topbar">
+      <div class="search" id="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="text" placeholder="Cari materi, mis. garis singgung" autocomplete="off" aria-label="Cari materi"><div class="sres" id="sres" hidden></div></div>
+      <div class="who"><span class="avatar" id="av"></span><b id="who-name"></b><span class="role" id="who-role"></span><button class="link" id="logout" type="button">Keluar</button></div>
+    </div>
+    <main id="app"></main>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmt(v,n){if(n==null)n=2;if(Math.abs(v)<Math.pow(10,-n)/2)v=0;return v.toFixed(n).replace('.',',')}
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- ikon ---------- */
+var ICONS={
+  book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M8 7h8"/>',
+  chart:'<path d="M3 20h18"/><path d="M5 16l4-5 4 3 6-8"/>',
+  bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  check:'<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14c2.8 0 4.5 1.8 4.5 4.5"/>',
+  quiz:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+  trend:'<path d="M3 17c4 0 4-10 9-10s5 10 9 10"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'
+};
+function ni(n){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[n]+'</svg>'}
+function ic(n,g){return '<span class="ico'+(g?' g':'')+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[n]+'</svg></span>'}
+
+/* ---------- data materi ---------- */
+var LIM_A={fns:[
+  {label:'f(x) = (x² − 4) / (x − 2), x → 2',f:function(x){return Math.abs(x-2)<1e-9?NaN:(x*x-4)/(x-2)},a:2,xr:[-1,5],yr:[-1,7],dmax:2,holes:[[2,4]],L:4,note:'Setelah disederhanakan, grafiknya sama dengan y = x + 2 dengan lubang di x = 2.'},
+  {label:'f(x) = sin(x) / x, x → 0',f:function(x){return Math.abs(x)<1e-9?NaN:Math.sin(x)/x},a:0,xr:[-8,8],yr:[-0.5,1.3],dmax:4,holes:[[0,1]],L:1,note:'Di x = 0 fungsi tidak terdefinisi, tetapi nilai di sekitarnya menuju 1.'},
+  {label:'f(x) = |x| / x, x → 0',f:function(x){return Math.abs(x)<1e-9?NaN:Math.abs(x)/x},a:0,xr:[-3,3],yr:[-2,2],dmax:2,holes:[[0,-1],[0,1]],L:null,note:'Dari kiri nilainya −1, dari kanan nilainya 1. Karena berbeda, limit tidak ada.'}
+]};
+var LIM_B={fns:[
+  {label:'f(x) = (x² − 9) / (x − 3), x → 3',f:function(x){return Math.abs(x-3)<1e-9?NaN:(x*x-9)/(x-3)},a:3,xr:[0,6],yr:[0,10],dmax:3,holes:[[3,6]],L:6,note:'Faktorkan: (x − 3)(x + 3)/(x − 3) = x + 3. Untuk x → 3 hasilnya 6.'},
+  {label:'f(x) = (x² − x − 6) / (x − 3), x → 3',f:function(x){return Math.abs(x-3)<1e-9?NaN:(x*x-x-6)/(x-3)},a:3,xr:[0,6],yr:[0,9],dmax:3,holes:[[3,5]],L:5,note:'Faktorkan: (x − 3)(x + 2)/(x − 3) = x + 2. Untuk x → 3 hasilnya 5.'},
+  {label:'f(x) = (√x − 2) / (x − 4), x → 4',f:function(x){return (x<0||Math.abs(x-4)<1e-9)?NaN:(Math.sqrt(x)-2)/(x-4)},a:4,xr:[0,9],yr:[0,0.6],dmax:3,holes:[[4,0.25]],L:0.25,Ltext:'0,25',note:'Kalikan dengan sekawan: (√x − 2)/(x − 4) = 1/(√x + 2). Untuk x → 4 hasilnya 1/4.'}
+]};
+var SEC={fns:[
+  {label:'f(x) = x²',f:function(x){return x*x},d:function(x){return 2*x},xr:[-3,3],yr:[-1,9],amin:-2.5,amax:2.5,rule:'f′(x) = 2x'},
+  {label:'f(x) = x³',f:function(x){return x*x*x},d:function(x){return 3*x*x},xr:[-3,3],yr:[-9,9],amin:-2,amax:2,rule:'f′(x) = 3x²'},
+  {label:'f(x) = sin x',f:Math.sin,d:Math.cos,xr:[-4,4],yr:[-2,2],amin:-3,amax:3,rule:'f′(x) = cos x'}
+]};
+var DER_A={status:false,fns:[
+  {label:'f(x) = x²',f:function(x){return x*x},d:function(x){return 2*x},xr:[-3,3],yr:[-7,10],amin:-2.8,amax:2.8,rule:'f′(x) = 2x'},
+  {label:'f(x) = x³',f:function(x){return x*x*x},d:function(x){return 3*x*x},xr:[-2.5,2.5],yr:[-18,20],amin:-2.4,amax:2.4,rule:'f′(x) = 3x²'},
+  {label:'f(x) = 3x² + 5x − 7',f:function(x){return 3*x*x+5*x-7},d:function(x){return 6*x+5},xr:[-4,3],yr:[-22,38],amin:-3.8,amax:2.8,rule:'f′(x) = 6x + 5'}
+]};
+var DER_B={status:true,fns:[
+  {label:'f(x) = x³ − 3x',f:function(x){return x*x*x-3*x},d:function(x){return 3*x*x-3},xr:[-2.5,2.5],yr:[-9,17],amin:-2.4,amax:2.4,rule:'f′(x) = 3x² − 3'},
+  {label:'f(x) = x² − 4x',f:function(x){return x*x-4*x},d:function(x){return 2*x-4},xr:[-1,5],yr:[-7,8],amin:-0.8,amax:4.8,rule:'f′(x) = 2x − 4'},
+  {label:'f(x) = −x² + 4',f:function(x){return -x*x+4},d:function(x){return -2*x},xr:[-3,3],yr:[-7,6],amin:-2.8,amax:2.8,rule:'f′(x) = −2x'}
+]};
+
+var SUBS=[
+ {id:'1.1',m:'limit',title:'Konsep limit',icon:'chart',goal:'Menjelaskan arti limit dari nilai di sekitar suatu titik.',
+  text:['Limit menjawab satu pertanyaan: ke nilai berapa f(x) mendekat ketika x mendekati a. Nilai f(a) sendiri boleh tidak ada, karena yang dilihat hanya nilai di sekitar a.','Limit ada jika nilai dari kiri dan dari kanan sama. Jika berbeda, limit tidak ada.'],
+  formulas:['lim f(x) = L   (x → a)','limit kiri = limit kanan = L  →  limit ada'],
+  widget:{type:'limit',cfg:LIM_A},
+  ex:{q:'Tentukan lim (x² − 4)/(x − 2) untuk x → 2 dengan melihat nilai di sekitar 2.',steps:['Substitusi x = 2 menghasilkan 0/0, jadi belum bisa disimpulkan.','Dari kiri: x = 1,9 menghasilkan 3,9 dan x = 1,99 menghasilkan 3,99.','Dari kanan: x = 2,1 menghasilkan 4,1 dan x = 2,01 menghasilkan 4,01.','Nilai dari kiri dan kanan sama-sama mendekati 4, jadi limitnya 4.']},
+  lat:[
+   {q:'Pada widget, f(x) = |x|/x di x → 0 memiliki limit …',o:['1','−1','tidak ada','0'],a:2,e:'Dari kiri nilainya −1 dan dari kanan 1. Karena berbeda, limit tidak ada.'},
+   {q:'Syarat limit f(x) ada di x = a adalah …',o:['f(a) harus terdefinisi','limit kiri sama dengan limit kanan','grafik melalui titik asal','f(x) selalu positif'],a:1,e:'Limit ada jika nilai dari kiri dan kanan sama. Nilai f(a) tidak menentukan.'},
+   {q:'Jika f(x) mendekati 5 dari kiri dan dari kanan saat x → 3, maka lim f(x) = …',o:['3','5','tidak ada','f(3)'],a:1,e:'Nilai dari kedua sisi sama, yaitu 5. Limit tidak bergantung pada f(3).'}
+  ]},
+ {id:'1.2',m:'limit',title:'Menghitung limit aljabar',icon:'book',goal:'Menghitung limit dengan substitusi, faktorisasi, dan sekawan.',
+  text:['Langkah pertama selalu substitusi langsung. Jika hasilnya bilangan biasa, itulah limitnya. Jika hasilnya 0/0, ubah bentuk fungsinya terlebih dahulu.','Dua cara yang sering dipakai: faktorisasi lalu coret faktor yang sama, dan kalikan dengan sekawan jika ada bentuk akar.'],
+  formulas:['(x² − 9)/(x − 3) = (x − 3)(x + 3)/(x − 3) = x + 3','(√x − 2)/(x − 4) = 1/(√x + 2)'],
+  widget:{type:'limit',cfg:LIM_B},
+  ex:{q:'Tentukan lim (x² − x − 6)/(x − 3) untuk x → 3.',steps:['Substitusi x = 3: pembilang 9 − 3 − 6 = 0 dan penyebut 0, bentuknya 0/0.','Faktorkan pembilang: x² − x − 6 = (x − 3)(x + 2).','Coret faktor (x − 3), sehingga fungsinya menjadi x + 2.','Substitusi x = 3: 3 + 2 = 5. Jadi limitnya 5.']},
+  lat:[
+   {q:'lim (x² − 16)/(x − 4) untuk x → 4 adalah …',o:['0','4','8','tidak ada'],a:2,e:'Faktorkan: (x − 4)(x + 4)/(x − 4) = x + 4. Untuk x → 4 hasilnya 8.'},
+   {q:'lim (2x + 3) untuk x → 1 adalah …',o:['3','4','5','6'],a:2,e:'Substitusi langsung: 2(1) + 3 = 5.'},
+   {q:'lim (√x − 3)/(x − 9) untuk x → 9 adalah …',o:['1/6','1/3','3','0'],a:0,e:'Sederhanakan menjadi 1/(√x + 3). Untuk x → 9 hasilnya 1/6.'}
+  ]},
+ {id:'2.1',m:'turunan',title:'Konsep turunan',icon:'chart',goal:'Menafsirkan turunan sebagai gradien garis singgung.',
+  text:['Garis potong melalui dua titik pada kurva punya gradien yang mudah dihitung. Jika titik kedua digeser mendekati titik pertama, garis potong berubah menjadi garis singgung.','Gradien garis singgung di titik a disebut turunan f di a, ditulis f′(a). Nilainya adalah limit gradien garis potong saat h mendekati 0.'],
+  formulas:['f′(a) = lim [f(a + h) − f(a)] / h   (h → 0)'],
+  widget:{type:'secant',cfg:SEC},
+  ex:{q:'Tentukan f′(2) untuk f(x) = x² dengan definisi turunan.',steps:['Tulis definisi: f′(2) = lim [f(2 + h) − f(2)] / h.','f(2 + h) = (2 + h)² = 4 + 4h + h², dan f(2) = 4.','Selisihnya 4h + h². Dibagi h menjadi 4 + h.','Saat h → 0, nilainya 4. Jadi f′(2) = 4.']},
+  lat:[
+   {q:'Turunan di suatu titik menunjukkan …',o:['luas di bawah kurva','gradien garis singgung di titik itu','nilai fungsi di titik itu','jarak dua titik pada kurva'],a:1,e:'Turunan di titik a adalah gradien garis singgung kurva di titik tersebut.'},
+   {q:'Saat h makin kecil, garis potong makin mendekati …',o:['sumbu x','garis singgung','sumbu y','garis tegak lurus sumbu x'],a:1,e:'Pada batas h → 0, garis potong menjadi garis singgung.'},
+   {q:'Untuk f(x) = x², gradien garis potong dari x = 1 ke x = 1 + h adalah …',o:['2 + h','2h','1 + h','h'],a:0,e:'((1 + h)² − 1)/h = (2h + h²)/h = 2 + h.'}
+  ]},
+ {id:'2.2',m:'turunan',title:'Aturan turunan',icon:'book',goal:'Menentukan turunan dengan aturan pangkat, jumlah, dan selisih.',
+  text:['Menghitung turunan dengan definisi limit memakan waktu. Aturan berikut mempercepatnya: turunan xⁿ adalah n·xⁿ⁻¹, turunan konstanta adalah 0, dan turunan jumlah atau selisih adalah jumlah atau selisih turunannya.','Konstanta pengali ikut terbawa: turunan c·f(x) adalah c·f′(x).'],
+  formulas:['f(x) = xⁿ  →  f′(x) = n·xⁿ⁻¹','(u ± v)′ = u′ ± v′   dan   (c·u)′ = c·u′'],
+  widget:{type:'deriv',cfg:DER_A},
+  ex:{q:'Turunkan f(x) = 3x² + 5x − 7.',steps:['Turunkan tiap suku. Suku 3x²: 3 · 2x = 6x.','Suku 5x: 5 · 1 = 5.','Suku −7 adalah konstanta, turunannya 0.','Jadi f′(x) = 6x + 5.']},
+  lat:[
+   {q:'Turunan f(x) = x⁴ adalah …',o:['x³','4x³','4x⁴','3x⁴'],a:1,e:'Aturan pangkat: n·xⁿ⁻¹ = 4x³.'},
+   {q:'Turunan f(x) = 5x² − 4x + 1 adalah …',o:['10x − 4','10x + 1','5x − 4','10x − 3'],a:0,e:'Turunkan tiap suku: 10x − 4 + 0.'},
+   {q:'Jika f(x) = 2x³, maka f′(1) = …',o:['2','3','6','8'],a:2,e:'f′(x) = 6x². Untuk x = 1 nilainya 6.'}
+  ]},
+ {id:'2.3',m:'turunan',title:'Penerapan turunan',icon:'bulb',goal:'Menentukan garis singgung dan nilai stasioner dengan turunan.',
+  text:['Gradien garis singgung di titik (a, f(a)) adalah f′(a). Persamaan garisnya y − f(a) = f′(a)(x − a).','Jika f′(x) > 0 fungsi naik, jika f′(x) < 0 fungsi turun. Nilai stasioner terjadi saat f′(x) = 0, dan di titik itu garis singgung mendatar.'],
+  formulas:['y − f(a) = f′(a)(x − a)','f′(x) > 0 naik   |   f′(x) < 0 turun   |   f′(x) = 0 stasioner'],
+  widget:{type:'deriv',cfg:DER_B},
+  ex:{q:'Tentukan nilai stasioner f(x) = x³ − 3x.',steps:['f′(x) = 3x² − 3.','Stasioner jika f′(x) = 0, jadi 3x² − 3 = 0 dan x = −1 atau x = 1.','f(−1) = −1 + 3 = 2 dan f(1) = 1 − 3 = −2.','Di x = −1 fungsi naik lalu turun, jadi maksimum lokal di (−1, 2). Di x = 1 fungsi turun lalu naik, jadi minimum lokal di (1, −2).']},
+  lat:[
+   {q:'Gradien garis singgung y = x² di x = 3 adalah …',o:['3','6','9','12'],a:1,e:'y′ = 2x. Untuk x = 3 gradiennya 6.'},
+   {q:'Fungsi f turun pada suatu interval jika …',o:['f′(x) > 0','f′(x) = 0','f′(x) < 0','f(x) < 0'],a:2,e:'Turunan negatif berarti gradien negatif, jadi fungsi turun.'},
+   {q:'Nilai stasioner f(x) = x² − 4x terjadi di x = …',o:['−2','0','2','4'],a:2,e:'f′(x) = 2x − 4 = 0 memberi x = 2.'}
+  ]}
+];
+var KUIS=[
+ {q:'lim (x² − 9)/(x − 3) untuk x → 3 adalah …',o:['0','3','6','tidak ada'],a:2,t:'Limit',e:'Faktorkan: (x − 3)(x + 3)/(x − 3) = x + 3. Untuk x → 3 hasilnya 6.'},
+ {q:'lim (3x + 1) untuk x → 2 adalah …',o:['5','6','7','9'],a:2,t:'Limit',e:'Substitusi langsung: 3(2) + 1 = 7.'},
+ {q:'lim (x² − 25)/(x − 5) untuk x → 5 adalah …',o:['0','5','10','tidak ada'],a:2,t:'Limit',e:'Faktorkan menjadi x + 5. Untuk x → 5 hasilnya 10.'},
+ {q:'Limit f(x) ada di x = a jika …',o:['f(a) terdefinisi','limit kiri sama dengan limit kanan','f(x) naik','f(a) = 0'],a:1,t:'Limit',e:'Limit ada jika nilai dari kiri dan kanan sama.'},
+ {q:'Jika f(x) = x³, maka f′(2) = …',o:['6','8','12','24'],a:2,t:'Turunan',e:'f′(x) = 3x². Untuk x = 2: 3(4) = 12.'},
+ {q:'Turunan f(x) = 5x² − 4x + 1 adalah …',o:['10x − 4','10x − 3','5x − 4','10x + 1'],a:0,t:'Turunan',e:'Turunkan tiap suku: 10x − 4.'},
+ {q:'Gradien garis singgung y = x² + 1 di x = 2 adalah …',o:['2','4','5','8'],a:1,t:'Turunan',e:'y′ = 2x. Untuk x = 2 gradiennya 4.'},
+ {q:'Persamaan garis singgung y = x² di titik (3, 9) adalah …',o:['y = 6x − 9','y = 6x + 9','y = 3x','y = 9x − 18'],a:0,t:'Turunan',e:'Gradien 6, sehingga y − 9 = 6(x − 3), yaitu y = 6x − 9.'},
+ {q:'Nilai stasioner f(x) = x³ − 3x terjadi di …',o:['x = 0','x = −1 dan x = 1','x = 3','x = 1 saja'],a:1,t:'Turunan',e:'f′(x) = 3x² − 3 = 0 memberi x = −1 dan x = 1.'},
+ {q:'Pada f(x) = x² − 4x, fungsi turun untuk …',o:['x < 2','x > 2','x < 0','x > 4'],a:0,t:'Turunan',e:'f′(x) = 2x − 4 < 0 jika x < 2.'}
+];
+
+/* ---------- state ---------- */
+var KEY='calcspace-v1';
+var st={user:null,done:{},latihan:{},kuis:null,show:{limit:true,turunan:true,kuis:true},snap:null};
+try{
+  var raw=localStorage.getItem(KEY);
+  if(raw){var o=JSON.parse(raw);
+    if(o&&typeof o==='object'){
+      if(o.user&&typeof o.user.name==='string'&&(o.user.role==='siswa'||o.user.role==='guru'))st.user={name:o.user.name.slice(0,40),role:o.user.role};
+      if(o.done&&typeof o.done==='object')st.done=o.done;
+      if(o.latihan&&typeof o.latihan==='object')st.latihan=o.latihan;
+      if(typeof o.kuis==='number')st.kuis=o.kuis;
+      if(o.show&&typeof o.show==='object')st.show={limit:o.show.limit!==false,turunan:o.show.turunan!==false,kuis:o.show.kuis!==false};
+      if(o.snap&&typeof o.snap==='object')st.snap=o.snap;
+    }}
+}catch(e){}
+function pct(){var n=0;SUBS.forEach(function(s){if(st.done[s.id])n++});if(st.kuis!=null)n++;return Math.round(n/(SUBS.length+1)*100)}
+function save(){
+  if(st.user&&st.user.role==='siswa')st.snap={name:st.user.name,pct:pct(),score:st.kuis};
+  try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}
+}
+
+/* ---------- plot ---------- */
+function mk(xr,yr){
+  var W=400,H=260;
+  function X(x){return (x-xr[0])/(xr[1]-xr[0])*W}
+  function Y(y){return H-(y-yr[0])/(yr[1]-yr[0])*H}
+  function step(sp){return sp<=3?0.5:sp<=7?1:sp<=20?2:sp<=60?5:10}
+  function n2(v){return String(+v.toFixed(2)).replace('.',',')}
+  return {X:X,Y:Y,
+    base:function(){
+      var s='',sx=step(xr[1]-xr[0]),sy=step(yr[1]-yr[0]),v;
+      for(v=Math.ceil(xr[0]/sx)*sx;v<=xr[1]+1e-9;v+=sx){s+='<line class="gl" x1="'+X(v)+'" x2="'+X(v)+'" y1="0" y2="'+H+'"/>';if(Math.abs(v)>1e-9)s+='<text class="tl" x="'+(X(v)+3)+'" y="'+(H-4)+'">'+n2(v)+'</text>'}
+      for(v=Math.ceil(yr[0]/sy)*sy;v<=yr[1]+1e-9;v+=sy){s+='<line class="gl" y1="'+Y(v)+'" y2="'+Y(v)+'" x1="0" x2="'+W+'"/>';if(Math.abs(v)>1e-9)s+='<text class="tl" x="4" y="'+(Y(v)-3)+'">'+n2(v)+'</text>'}
+      if(xr[0]<0&&xr[1]>0)s+='<line class="ax" x1="'+X(0)+'" x2="'+X(0)+'" y1="0" y2="'+H+'"/>';
+      if(yr[0]<0&&yr[1]>0)s+='<line class="ax" y1="'+Y(0)+'" y2="'+Y(0)+'" x1="0" x2="'+W+'"/>';
+      return s;
+    },
+    curve:function(f,cls){
+      var N=500,d='',pen=false,py=0,i,x,y;
+      for(i=0;i<=N;i++){
+        x=xr[0]+(xr[1]-xr[0])*i/N;y=f(x);
+        if(!isFinite(y)||Math.abs(y)>1e4){pen=false;continue}
+        if(pen&&Math.abs(y-py)>(yr[1]-yr[0])*0.6)pen=false;
+        d+=(pen?'L':'M')+X(x).toFixed(1)+' '+Y(y).toFixed(1);pen=true;py=y;
+      }
+      return '<path class="'+(cls||'cv')+'" d="'+d+'"/>';
+    },
+    line:function(x0,y0,m,cls){
+      return '<line class="'+cls+'" x1="'+X(xr[0])+'" y1="'+Y(y0+m*(xr[0]-x0))+'" x2="'+X(xr[1])+'" y2="'+Y(y0+m*(xr[1]-x0))+'"/>';
+    }
+  };
+}
+var uidN=0;
+function fnSelect(id,fns){return '<select id="'+id+'">'+fns.map(function(f,i){return '<option value="'+i+'">'+esc(f.label)+'</option>'}).join('')+'</select>'}
+function rdo(label,id){return '<div><span class="lab">'+label+'</span><b id="'+id+'"></b></div>'}
+
+/* ---------- widget limit ---------- */
+function limitWidget(root,cfg){
+  var u='w'+(++uidN);
+  root.innerHTML='<div class="lab">Widget · mendekati titik a</div>'+
+   '<div class="ctl-row"><div class="ctl"><label class="lab" for="'+u+'f">Pilih fungsi</label>'+fnSelect(u+'f',cfg.fns)+'</div>'+
+   '<div class="ctl"><label class="lab" for="'+u+'d">Jarak x dari a (kiri negatif, kanan positif)</label><input type="range" id="'+u+'d" min="-1000" max="1000" value="-600" step="1"></div></div>'+
+   '<svg class="plot" id="'+u+'s" viewBox="0 0 400 260" role="img" aria-label="Grafik fungsi dengan titik yang bergerak mendekati a"></svg>'+
+   '<div class="readout">'+rdo('x',u+'x')+rdo('f(x)',u+'y')+rdo('Limit',u+'L')+'</div>'+
+   '<div class="note" id="'+u+'m"></div>'+
+   '<div class="tblwrap"><table><thead><tr><th>Dari kiri x</th><th class="num">f(x)</th><th>Dari kanan x</th><th class="num">f(x)</th></tr></thead><tbody id="'+u+'t"></tbody></table></div>';
+  var sel=$('#'+u+'f',root),rng=$('#'+u+'d',root);
+  function draw(){
+    var F=cfg.fns[+sel.value],g=mk(F.xr,F.yr);
+    var d=rng.value/1000*F.dmax,at=Math.abs(d)<F.dmax*0.0015,x=F.a+d,y=F.f(x);
+    var s=g.base()+g.curve(F.f,'cv');
+    s+='<line class="guide" x1="'+g.X(F.a)+'" x2="'+g.X(F.a)+'" y1="0" y2="260"/>';
+    F.holes.forEach(function(h){s+='<circle class="hole" cx="'+g.X(h[0])+'" cy="'+g.Y(h[1])+'" r="5"/>'});
+    if(!at&&isFinite(y))s+='<line class="guide" x1="'+g.X(x)+'" x2="'+g.X(x)+'" y1="'+g.Y(y)+'" y2="260"/><circle class="pt" cx="'+g.X(x)+'" cy="'+g.Y(y)+'" r="7"/>';
+    $('#'+u+'s',root).innerHTML=s;
+    $('#'+u+'x',root).textContent=at?'x = a':fmt(x,3);
+    $('#'+u+'y',root).textContent=(at||!isFinite(y))?'tidak ada':fmt(y,4);
+    $('#'+u+'L',root).textContent=F.L==null?'tidak ada':(F.Ltext||String(F.L));
+    var msg=at?'Tepat di x = a fungsi tidak terdefinisi (lingkaran kosong). ':('Titik bergerak dari '+(d<0?'kiri':'kanan')+'. ');
+    $('#'+u+'m',root).textContent=msg+F.note;
+    var rows='';
+    [0.1,0.01,0.001].forEach(function(e){
+      rows+='<tr><td class="num">'+fmt(F.a-e,3)+'</td><td class="num">'+fmt(F.f(F.a-e),4)+'</td><td class="num">'+fmt(F.a+e,3)+'</td><td class="num">'+fmt(F.f(F.a+e),4)+'</td></tr>';
+    });
+    $('#'+u+'t',root).innerHTML=rows;
+  }
+  sel.onchange=function(){rng.value=-600;draw()};
+  rng.oninput=draw;
+  draw();
+}
+
+/* ---------- widget garis potong ---------- */
+function secantWidget(root,cfg){
+  var u='w'+(++uidN),anim=null;
+  root.innerHTML='<div class="lab">Widget · garis potong menjadi garis singgung</div>'+
+   '<div class="ctl-row"><div class="ctl"><label class="lab" for="'+u+'f">Pilih fungsi</label>'+fnSelect(u+'f',cfg.fns)+'</div>'+
+   '<div class="ctl"><label class="lab" for="'+u+'a">Titik a</label><input type="range" id="'+u+'a" min="-1000" max="1000" value="400"></div>'+
+   '<div class="ctl"><label class="lab" for="'+u+'h">Jarak h</label><input type="range" id="'+u+'h" min="1" max="200" value="150"></div></div>'+
+   '<div class="btns"><button class="btn" type="button" id="'+u+'go">Kecilkan h sampai mendekati 0</button></div>'+
+   '<svg class="plot" id="'+u+'s" viewBox="0 0 400 260" role="img" aria-label="Grafik fungsi dengan garis potong dan garis singgung"></svg>'+
+   '<div class="legend"><b style="color:#0B1B4D">━</b> garis potong &nbsp; <b style="color:#22B35A">╍</b> garis singgung</div>'+
+   '<div class="readout">'+rdo('Titik P',u+'p')+rdo('Titik Q',u+'q')+rdo('Gradien potong',u+'ms')+rdo('Turunan f′(a)',u+'mt')+'</div>'+
+   '<div class="note" id="'+u+'m"></div>';
+  var sel=$('#'+u+'f',root),ra=$('#'+u+'a',root),rh=$('#'+u+'h',root);
+  function vals(){
+    var F=cfg.fns[+sel.value];
+    var a=F.amin+(Number(ra.value)+1000)/2000*(F.amax-F.amin);
+    a=Math.round(a*20)/20;
+    return {F:F,a:a,h:Number(rh.value)/100};
+  }
+  function draw(){
+    var v=vals(),F=v.F,a=v.a,h=v.h,g=mk(F.xr,F.yr),fa=F.f(a),b=a+h,fb=F.f(b),ms=(fb-fa)/h,mt=F.d(a);
+    var s=g.base()+g.curve(F.f,'cv')+g.line(a,fa,mt,'tan')+g.line(a,fa,ms,'sec');
+    s+='<circle class="pt2" cx="'+g.X(a)+'" cy="'+g.Y(fa)+'" r="6"/><circle class="pt" cx="'+g.X(b)+'" cy="'+g.Y(fb)+'" r="6"/>';
+    $('#'+u+'s',root).innerHTML=s;
+    $('#'+u+'p',root).textContent='('+fmt(a,2)+'; '+fmt(fa,2)+')';
+    $('#'+u+'q',root).textContent='('+fmt(b,2)+'; '+fmt(fb,2)+')';
+    $('#'+u+'ms',root).textContent=fmt(ms,4);
+    $('#'+u+'mt',root).textContent=fmt(mt,4);
+    var gap=Math.abs(ms-mt);
+    $('#'+u+'m',root).textContent=h<=0.05?'Dengan h sekecil ini garis potong hampir berimpit dengan garis singgung. Selisih gradiennya hanya '+fmt(gap,4)+'. Rumusnya: '+F.rule+'.':'Dengan h = '+fmt(h,2)+', selisih gradien potong dan singgung masih '+fmt(gap,3)+'. Perkecil h dan lihat selisihnya mengecil.';
+  }
+  sel.onchange=function(){ra.value=400;rh.value=150;draw()};
+  ra.oninput=draw;
+  rh.oninput=function(){if(anim){cancelAnimationFrame(anim);anim=null}draw()};
+  $('#'+u+'go',root).onclick=function(){
+    if(anim){cancelAnimationFrame(anim);anim=null}
+    var start=Number(rh.value),t0=null,dur=2400;
+    if(reduce||start<=1){rh.value=1;draw();return}
+    function tick(t){
+      if(t0==null)t0=t;
+      var p=Math.min(1,(t-t0)/dur);
+      rh.value=Math.max(1,Math.round(start*Math.pow(1/start,p)));
+      draw();
+      anim=p<1?requestAnimationFrame(tick):null;
+    }
+    anim=requestAnimationFrame(tick);
+  };
+  draw();
+}
+
+/* ---------- widget f dan f' ---------- */
+function derivWidget(root,cfg){
+  var u='w'+(++uidN);
+  root.innerHTML='<div class="lab">Widget · f(x) dan turunannya f′(x)</div>'+
+   '<div class="ctl-row"><div class="ctl"><label class="lab" for="'+u+'f">Pilih fungsi</label>'+fnSelect(u+'f',cfg.fns)+'</div>'+
+   '<div class="ctl"><label class="lab" for="'+u+'a">Titik a</label><input type="range" id="'+u+'a" min="-1000" max="1000" value="500"></div></div>'+
+   '<svg class="plot" id="'+u+'s" viewBox="0 0 400 260" role="img" aria-label="Grafik fungsi, grafik turunannya, dan garis singgung di titik a"></svg>'+
+   '<div class="legend"><b style="color:#0B1B4D">━</b> f(x) &nbsp; <b style="color:#1747D6">━</b> f′(x) &nbsp; <b style="color:#22B35A">╍</b> garis singgung di a</div>'+
+   '<div class="readout">'+rdo('a',u+'ra')+rdo('f(a)',u+'rf')+rdo('f′(a)',u+'rd')+'</div>'+
+   '<div class="note" id="'+u+'m"></div>';
+  var sel=$('#'+u+'f',root),ra=$('#'+u+'a',root);
+  function draw(){
+    var F=cfg.fns[+sel.value],g=mk(F.xr,F.yr);
+    var a=F.amin+(Number(ra.value)+1000)/2000*(F.amax-F.amin);a=Math.round(a*20)/20;
+    var fa=F.f(a),m=F.d(a);
+    var s=g.base()+g.curve(F.f,'cv')+g.curve(F.d,'cv2')+g.line(a,fa,m,'tan');
+    s+='<circle class="pt2" cx="'+g.X(a)+'" cy="'+g.Y(fa)+'" r="6"/><circle class="pt3" cx="'+g.X(a)+'" cy="'+g.Y(m)+'" r="6"/>';
+    $('#'+u+'s',root).innerHTML=s;
+    $('#'+u+'ra',root).textContent=fmt(a,2);
+    $('#'+u+'rf',root).textContent=fmt(fa,2);
+    $('#'+u+'rd',root).textContent=fmt(m,2);
+    var msg;
+    if(cfg.status){
+      if(Math.abs(m)<0.1)msg='f′(a) mendekati 0: garis singgung mendatar, titik stasioner.';
+      else if(m>0)msg='f′(a) > 0: fungsi sedang naik di titik ini.';
+      else msg='f′(a) < 0: fungsi sedang turun di titik ini.';
+      msg+=' Rumus: '+F.rule+'.';
+    }else{
+      msg='Gradien garis singgung di x = a adalah f′(a) = '+fmt(m,2)+'. Cocokkan dengan aturan: '+F.rule+'.';
+    }
+    $('#'+u+'m',root).textContent=msg;
+  }
+  sel.onchange=function(){ra.value=500;draw()};
+  ra.oninput=draw;
+  draw();
+}
+var WIDGETS={limit:limitWidget,secant:secantWidget,deriv:derivWidget};
+
+/* ---------- blok soal ---------- */
+function qBlock(root,qs,pre,onDone){
+  root.innerHTML='<div class="qwrap">'+qs.map(function(q,i){
+    return '<fieldset class="q"><legend>'+(i+1)+'. '+esc(q.q)+'</legend>'+q.o.map(function(t,j){
+      return '<label class="opt" id="'+pre+'l'+i+'_'+j+'"><input type="radio" name="'+pre+'q'+i+'" id="'+pre+'q'+i+'o'+j+'" value="'+j+'"><span>'+esc(t)+'</span></label>';
+    }).join('')+'<div class="fb" id="'+pre+'f'+i+'" hidden></div></fieldset>';
+  }).join('')+'</div><div class="btns" style="margin-top:14px"><button class="btn primary" type="button" id="'+pre+'chk">Periksa jawaban</button><button class="btn" type="button" id="'+pre+'rst">Ulangi</button></div><div class="panel" id="'+pre+'res" hidden style="margin-top:14px"></div>';
+  $('#'+pre+'chk',root).onclick=function(){
+    var ok=0,ans=0;
+    qs.forEach(function(q,i){
+      var sel=root.querySelector('input[name="'+pre+'q'+i+'"]:checked'),fb=$('#'+pre+'f'+i,root);
+      q.o.forEach(function(_,j){$('#'+pre+'l'+i+'_'+j,root).classList.remove('right','wrong')});
+      $('#'+pre+'l'+i+'_'+q.a,root).classList.add('right');
+      if(sel){ans++;if(Number(sel.value)===q.a){ok++;fb.textContent='Benar. '+q.e}else{$('#'+pre+'l'+i+'_'+sel.value,root).classList.add('wrong');fb.textContent='Belum tepat. '+q.e}}
+      else fb.textContent='Belum dijawab. '+q.e;
+      fb.hidden=false;
+    });
+    var score=Math.round(ok/qs.length*100),res=$('#'+pre+'res',root);
+    res.hidden=false;
+    res.innerHTML='<span class="lab">Hasil</span><div class="score">'+(qs.length===10?score:ok+'/'+qs.length)+'</div><p>'+ok+' dari '+qs.length+' soal benar'+(ans<qs.length?' ('+(qs.length-ans)+' belum dijawab).':'.')+'</p>';
+    if(onDone)onDone(ok,score);
+  };
+  $('#'+pre+'rst',root).onclick=function(){qBlock(root,qs,pre,onDone)};
+}
+
+/* ---------- tampilan siswa ---------- */
+var route='home',curSub={limit:'1.1',turunan:'2.1'};
+function subList(m){return SUBS.filter(function(s){return s.m===m})}
+
+function thumb(s){
+  var t=s.widget.type,c=s.m==='limit'?['#2F6BFF','#8FB8FF']:['#1238A6','#5B8CFF'],id='tg'+s.id.replace('.','');
+  var g='<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c[0]+'"/><stop offset="1" stop-color="'+c[1]+'"/></linearGradient></defs><rect width="200" height="110" fill="url(#'+id+')"/><circle cx="170" cy="14" r="40" fill="#fff" opacity=".12"/>';
+  var b='';
+  if(t==='limit')b='<line x1="104" y1="10" x2="104" y2="100" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 4" opacity=".7"/><path d="M16 88 C60 84 84 60 104 50 S160 26 186 18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="104" cy="50" r="6" fill="#2F6BFF" stroke="#fff" stroke-width="3"/>';
+  else if(t==='secant')b='<path d="M24 20 Q100 130 176 20" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><line x1="60" y1="92" x2="176" y2="42" stroke="#fff" stroke-width="3" opacity=".9"/><line x1="30" y1="75" x2="170" y2="75" stroke="#7BE0A0" stroke-width="3" stroke-dasharray="7 5"/><circle cx="100" cy="75" r="6" fill="#22B35A" stroke="#fff" stroke-width="2"/><circle cx="145.6" cy="55.2" r="6" fill="#fff"/>';
+  else b='<path d="M16 62 C50 10 80 10 100 55 S150 100 186 40" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M16 92 C60 92 70 32 100 32 S150 92 186 92" fill="none" stroke="#BFD4FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="100" cy="55" r="6" fill="#22B35A" stroke="#fff" stroke-width="2"/>';
+  return '<svg viewBox="0 0 200 110" aria-hidden="true">'+g+b+'</svg>';
+}
+function bannerArt(){
+  return '<svg viewBox="0 0 260 200" aria-hidden="true">'+
+  '<rect x="30" y="148" width="150" height="26" rx="6" fill="#fff"/><rect x="30" y="148" width="150" height="8" rx="4" fill="#C9D9FF"/>'+
+  '<rect x="46" y="120" width="130" height="26" rx="6" fill="#22B35A"/><rect x="46" y="120" width="130" height="8" rx="4" fill="#7BE0A0"/>'+
+  '<rect x="38" y="92" width="140" height="26" rx="6" fill="#8FB8FF"/><rect x="38" y="92" width="140" height="8" rx="4" fill="#DCE8FF"/>'+
+  '<rect x="120" y="14" width="124" height="86" rx="14" fill="#fff"/>'+
+  '<line x1="136" y1="84" x2="230" y2="84" stroke="#C9D3EA" stroke-width="2"/><line x1="136" y1="30" x2="136" y2="84" stroke="#C9D3EA" stroke-width="2"/>'+
+  '<path d="M138 80 C160 80 170 36 188 36 S214 70 230 52" fill="none" stroke="#1747D6" stroke-width="4" stroke-linecap="round"/>'+
+  '<line x1="166" y1="62" x2="214" y2="30" stroke="#22B35A" stroke-width="3" stroke-dasharray="6 4"/><circle cx="188" cy="46" r="6" fill="#22B35A"/></svg>';
+}
+function countDone(m){return subList(m).filter(function(s){return st.done[s.id]}).length}
+function nextTarget(){
+  var i,s;
+  for(i=0;i<SUBS.length;i++){s=SUBS[i];if(st.show[s.m]!==false&&!st.done[s.id])return {go:s.m,sub:s.id,label:'Lanjutkan: '+s.title}}
+  if(st.show.kuis!==false)return {go:'kuis',sub:'',label:st.kuis==null?'Kerjakan kuis akhir':'Ulangi kuis akhir'};
+  return {go:'limit',sub:'1.1',label:'Ulas kembali materi'};
+}
+function mcard(s){
+  var lt=st.latihan[s.id],p=st.done[s.id]?100:(lt!=null?Math.round(lt/3*100):0);
+  var pill=st.done[s.id]?'<span class="pill ok">Selesai</span>':(lt!=null?'<span class="pill warn">Latihan '+lt+'/3</span>':'<span class="pill">Belum dimulai</span>');
+  return '<button class="mc" type="button" data-go="'+s.m+'" data-sub="'+s.id+'"><span class="th">'+thumb(s)+'</span><span class="mt"><span class="lab">Sub-materi '+s.id+'</span><b>'+esc(s.title)+'</b><span class="mp">'+esc(s.goal)+'</span><span class="bar2" style="height:8px"><b style="width:'+p+'%"></b></span>'+pill+'</span></button>';
+}
+function vHome(){
+  var p=pct(),nt=nextTarget(),secs='';
+  ['limit','turunan'].forEach(function(m){
+    if(st.show[m]===false)return;
+    secs+='<div><div class="sh"><h2>'+(m==='limit'?'Materi 1 · Limit fungsi':'Materi 2 · Turunan fungsi')+'</h2><button class="link" type="button" data-go="'+m+'">Lihat semua</button></div><div class="mgrid">'+subList(m).map(mcard).join('')+'</div></div>';
+  });
+  if(st.show.kuis!==false)secs+='<div><div class="sh"><h2>Evaluasi</h2></div><div class="grid"><button class="card" type="button" data-go="kuis">'+ic('quiz',true)+'<span class="tx"><h3>Kuis akhir</h3><p>10 soal pilihan ganda dengan pembahasan.</p>'+(st.kuis!=null?'<span class="pill ok">Nilai '+st.kuis+'</span>':'<span class="pill">Belum dikerjakan</span>')+'</span></button></div></div>';
+  var ach='<div class="panel"><h3>Pencapaian</h3>'+
+    '<div class="rrow"><div class="top"><span>Kemajuan total</span><b>'+p+'%</b></div><div class="bar2"><b style="width:'+p+'%"></b></div></div>'+
+    '<div class="rrow"><div class="top"><span>Limit</span><b>'+countDone('limit')+'/2</b></div><div class="bar2"><b style="width:'+countDone('limit')/2*100+'%"></b></div></div>'+
+    '<div class="rrow"><div class="top"><span>Turunan</span><b>'+countDone('turunan')+'/3</b></div><div class="bar2"><b style="width:'+countDone('turunan')/3*100+'%"></b></div></div>'+
+    '<div class="rrow"><div class="top"><span>Kuis akhir</span><b>'+(st.kuis==null?'–':st.kuis)+'</b></div><div class="bar2"><b style="width:'+(st.kuis||0)+'%"></b></div></div></div>';
+  var lat='<div class="panel"><h3>Skor latihan</h3><div>'+SUBS.filter(function(s){return st.show[s.m]!==false}).map(function(s,i){
+    var lt=st.latihan[s.id];
+    return '<div class="lrow">'+ic(s.icon,i%2===1)+'<span class="tx"><b>'+esc(s.title)+'</b><small>'+(lt==null?'Belum dicoba':'Benar '+lt+' dari 3')+'</small></span><button class="mini" type="button" data-go="'+s.m+'" data-sub="'+s.id+'">Buka</button></div>';
+  }).join('')+'</div></div>';
+  return '<section class="view"><div class="banner"><div class="bt"><span class="lab" style="color:#C9D9FF">CALCSPACE · Calculus Learning Space</span><h1>Hai, '+esc(st.user.name)+'</h1><p>Geser widget untuk menemukan konsepnya sendiri, ikuti contoh langkah demi langkah, lalu uji pemahamanmu dengan latihan dan kuis.</p><button class="btn light" type="button" data-go="'+nt.go+'"'+(nt.sub?' data-sub="'+nt.sub+'"':'')+'>'+esc(nt.label)+'</button></div><div class="ba">'+bannerArt()+'</div></div>'+
+   '<div class="cols"><div style="display:flex;flex-direction:column;gap:24px;min-width:0">'+secs+'</div><div class="rail">'+ach+lat+'</div></div></section>';
+}
+
+function vMateri(m){
+  var subs=subList(m),id=curSub[m],s=subs.filter(function(x){return x.id===id})[0]||subs[0];
+  var title=m==='limit'?'Limit fungsi':'Turunan fungsi';
+  var tabs=subs.map(function(x){return '<button type="button" data-sub="'+x.id+'" aria-pressed="'+(x.id===s.id)+'">'+x.id+' '+esc(x.title)+'</button>'}).join('');
+  var next=null,i=SUBS.indexOf(s);if(i<SUBS.length-1)next=SUBS[i+1];
+  return '<section class="view"><div class="sec-t"><span class="lab">Materi '+(m==='limit'?1:2)+'</span><h2 style="font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800">'+title+'</h2></div>'+
+   '<div class="subtabs" id="subtabs">'+tabs+'</div>'+
+   '<div class="head"><span class="chip">'+s.id+'</span><h2>'+esc(s.title)+'</h2></div>'+
+   '<p class="goal"><b>Tujuan:</b> '+esc(s.goal)+'</p>'+
+   '<div class="prose">'+s.text.map(function(t){return '<p>'+esc(t)+'</p>'}).join('')+s.formulas.map(function(f){return '<div class="formula">'+esc(f)+'</div>'}).join('')+'</div>'+
+   '<div class="panel" id="wg"></div>'+
+   '<div class="panel"><h3>Contoh soal</h3><p>'+esc(s.ex.q)+'</p><ol class="steps" id="steps">'+s.ex.steps.map(function(t,k){return '<li'+(k>0?' hidden':'')+'>'+esc(t)+'</li>'}).join('')+'</ol><div class="btns"><button class="btn" type="button" id="more">Tampilkan langkah berikutnya</button></div></div>'+
+   '<div class="panel"><h3>Latihan</h3><div id="lat"></div></div>'+
+   '<div class="btns"><button class="btn primary" type="button" id="done">'+(st.done[s.id]?'Sub-materi '+s.id+' selesai ✓':'Tandai sub-materi '+s.id+' selesai')+'</button>'+(next?'<button class="btn" type="button" data-go="'+next.m+'" data-sub="'+next.id+'">Lanjut: '+esc(next.title)+'</button>':'<button class="btn" type="button" data-go="kuis">Lanjut ke kuis akhir</button>')+'</div></section>';
+}
+function bindMateri(m){
+  var subs=subList(m),id=curSub[m],s=subs.filter(function(x){return x.id===id})[0]||subs[0];
+  $$('#subtabs button').forEach(function(b){b.onclick=function(){curSub[m]=b.dataset.sub;draw()}});
+  WIDGETS[s.widget.type]($('#wg'),s.widget.cfg);
+  var shown=1,items=$$('#steps li'),more=$('#more');
+  if(items.length<=1)more.disabled=true;
+  more.onclick=function(){
+    if(shown<items.length){items[shown].hidden=false;shown++}
+    if(shown>=items.length){more.disabled=true;more.textContent='Semua langkah sudah tampil'}
+  };
+  qBlock($('#lat'),s.lat,'l'+s.id.replace('.','_')+'_',function(ok){st.latihan[s.id]=ok;save()});
+  $('#done').onclick=function(){st.done[s.id]=!st.done[s.id];save();this.textContent=st.done[s.id]?'Sub-materi '+s.id+' selesai ✓':'Tandai sub-materi '+s.id+' selesai'};
+}
+function vKuis(){
+  return '<section class="view"><div class="sec-t"><span class="lab">Evaluasi · 10 soal</span><h2 style="font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800">Kuis akhir</h2></div>'+
+   '<p class="goal" style="max-width:68ch">Kerjakan setelah mempelajari kedua materi. Nilai terbaru tersimpan dan terlihat di tampilan guru.</p>'+
+   (st.kuis!=null?'<p><span class="pill ok">Nilai terakhir '+st.kuis+'</span></p>':'')+
+   '<div id="qz"></div></section>';
+}
+function bindKuis(){qBlock($('#qz'),KUIS,'kz_',function(ok,score){st.kuis=score;save()})}
+
+/* ---------- tampilan guru ---------- */
+var SAMPLE=[['Aulia R.',100,90],['Bagas P.',100,80],['Citra D.',100,100],['Dimas A.',67,60],['Eka S.',100,40],['Farhan M.',33,null],['Gita N.',100,80],['Hana L.',67,20]];
+var ITEMS=[92,88,81,70,64,58,49,45,38,72];
+function status(p,n){
+  if((n==null&&p<50)||(n!=null&&n<60))return '<span class="pill bad">Perlu bantuan</span>';
+  if(p<100)return '<span class="pill warn">Berjalan</span>';
+  return '<span class="pill ok">Tuntas</span>';
+}
+function vGDash(){
+  var rows=SAMPLE.slice(),sn=st.snap;
+  var scored=rows.filter(function(r){return r[2]!=null});
+  var avg=scored.reduce(function(a,r){return a+r[2]},0)/scored.length;
+  var tuntas=rows.filter(function(r){return r[1]===100}).length;
+  var help=rows.filter(function(r){return (r[2]==null&&r[1]<50)||(r[2]!=null&&r[2]<60)}).length;
+  var weak=[];ITEMS.forEach(function(p,i){if(p<50)weak.push(i+1)});
+  var body=rows.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td style="min-width:130px"><div class="bar2"><b style="width:'+r[1]+'%"></b></div></td><td class="num">'+(r[2]==null?'–':r[2])+'</td><td>'+status(r[1],r[2])+'</td></tr>'}).join('');
+  if(sn)body+='<tr><td><b>'+esc(sn.name)+'</b> (data perangkat ini)</td><td style="min-width:130px"><div class="bar2"><b style="width:'+sn.pct+'%"></b></div></td><td class="num">'+(sn.score==null?'–':sn.score)+'</td><td>'+status(sn.pct,sn.score)+'</td></tr>';
+  return '<section class="view"><div class="sec-t"><span class="lab">Tampilan guru</span><h2 style="font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800">Dasbor kelas</h2></div>'+
+   '<span class="ex">CONTOH TAMPILAN</span><p style="max-width:62ch;color:var(--muted)">Ringkasan nilai dan kemajuan siswa dalam satu kelas. Baris siswa yang terakhir diambil dari perangkat ini.</p>'+
+   '<div class="tiles"><div class="tile"><span class="lab">Rata-rata kuis</span><b>'+Math.round(avg)+'</b></div><div class="tile"><span class="lab">Materi tuntas</span><b>'+tuntas+' / '+rows.length+'</b></div><div class="tile"><span class="lab">Perlu bantuan</span><b style="color:var(--bad)">'+help+'</b></div></div>'+
+   '<div class="panel"><h3>Kemajuan siswa</h3><div class="tblwrap"><table><thead><tr><th>Siswa</th><th>Kemajuan</th><th class="num">Nilai kuis</th><th>Status</th></tr></thead><tbody>'+body+'</tbody></table></div></div>'+
+   '<div class="panel"><h3>Persentase benar per soal kuis</h3>'+ITEMS.map(function(p,i){return '<div class="hbar"><span class="lab">Soal '+(i+1)+'</span><div class="bar2"><b class="'+(p<50?'low':'')+'" style="width:'+p+'%"></b></div><span style="text-align:right;font-family:var(--mono)">'+p+'%</span></div>'}).join('')+
+   '<p class="fb">'+(weak.length?'Perlu dibahas ulang: soal '+weak.join(', ')+' (di bawah 50% benar).':'Semua soal di atas 50% benar.')+'</p></div></section>';
+}
+function vGBank(){
+  var n=0,rows='';
+  SUBS.forEach(function(s){s.lat.forEach(function(q){n++;rows+='<tr><td class="num">'+n+'</td><td class="wrapt">'+esc(q.q)+'</td><td>'+esc(q.o[q.a])+'</td><td>Latihan '+s.id+'</td></tr>'})});
+  KUIS.forEach(function(q){n++;rows+='<tr><td class="num">'+n+'</td><td class="wrapt">'+esc(q.q)+'</td><td>'+esc(q.o[q.a])+'</td><td>Kuis · '+q.t+'</td></tr>'});
+  return '<section class="view"><div class="sec-t"><span class="lab">Tampilan guru</span><h2 style="font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800">Bank soal</h2></div>'+
+   '<p style="color:var(--muted);max-width:62ch">'+n+' soal: 15 soal latihan dan 10 soal kuis akhir, lengkap dengan kunci jawaban.</p>'+
+   '<div class="panel"><div class="tblwrap"><table><thead><tr><th class="num">No</th><th>Soal</th><th>Kunci</th><th>Asal</th></tr></thead><tbody>'+rows+'</tbody></table></div></div></section>';
+}
+function vGSet(){
+  var sw=[['limit','Tampilkan materi Limit'],['turunan','Tampilkan materi Turunan'],['kuis','Buka kuis akhir']];
+  return '<section class="view"><div class="sec-t"><span class="lab">Tampilan guru</span><h2 style="font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800">Pengaturan materi</h2></div>'+
+   '<div class="panel">'+sw.map(function(x){return '<div class="sw"><span>'+x[1]+'</span><button class="tg" type="button" role="switch" data-sw="'+x[0]+'" aria-checked="'+(st.show[x[0]]!==false)+'" aria-label="'+x[1]+'"></button></div>'}).join('')+
+   '<p class="fb">Perubahan langsung terlihat di menu siswa pada perangkat ini.</p></div></section>';
+}
+
+/* ---------- router ---------- */
+var NAV_S=[['home','Beranda','home'],['limit','Limit','chart'],['turunan','Turunan','trend'],['kuis','Kuis','quiz']];
+var NAV_G=[['g-dash','Dasbor','grid'],['g-bank','Bank soal','book'],['g-set','Pengaturan','gear']];
+function allowed(r){
+  var role=st.user.role;
+  if(role==='guru')return NAV_G.some(function(n){return n[0]===r});
+  if(!NAV_S.some(function(n){return n[0]===r}))return false;
+  return r==='home'||st.show[r]!==false;
+}
+function navHtml(){
+  var guru=st.user.role==='guru';
+  var nav=(guru?NAV_G:NAV_S).filter(function(n){return guru||n[0]==='home'||st.show[n[0]]!==false});
+  $('#nav').innerHTML=nav.map(function(n){return '<button type="button" data-go="'+n[0]+'"'+(n[0]===route?' aria-current="page"':'')+'>'+ni(n[2])+'<span>'+n[1]+'</span></button>'}).join('');
+  var sc=$('#sidecard');
+  if(guru)sc.innerHTML='<span class="lab">Tampilan guru</span><b>Pantau kelas</b><p class="fb">Nilai dan kemajuan siswa ada di Dasbor.</p>';
+  else{var p=pct();sc.innerHTML='<span class="lab">Kemajuan</span><b>'+p+'% selesai</b><div class="bar2"><b style="width:'+p+'%"></b></div>'}
+}
+function draw(){
+  var app=$('#app');
+  if(!st.user){$('#login').hidden=false;$('#shell').hidden=true;return}
+  $('#login').hidden=true;$('#shell').hidden=false;
+  var guru=st.user.role==='guru';
+  if(!allowed(route))route=guru?'g-dash':'home';
+  $('#who-name').textContent=st.user.name;
+  $('#av').textContent=st.user.name.charAt(0).toUpperCase();
+  var rl=$('#who-role');rl.textContent=guru?'Guru':'Siswa';rl.className='role'+(guru?' g':'');
+  $('#search').hidden=guru;
+  navHtml();
+  var html;
+  if(route==='home')html=vHome();
+  else if(route==='limit'||route==='turunan')html=vMateri(route);
+  else if(route==='kuis')html=vKuis();
+  else if(route==='g-dash')html=vGDash();
+  else if(route==='g-bank')html=vGBank();
+  else html=vGSet();
+  app.innerHTML=html+'<footer>CALCSPACE · Calculus Learning Space</footer>';
+  if(route==='limit'||route==='turunan')bindMateri(route);
+  if(route==='kuis')bindKuis();
+  if(route==='g-set')$$('.tg').forEach(function(b){b.onclick=function(){var k=b.dataset.sw;st.show[k]=!(st.show[k]!==false);save();b.setAttribute('aria-checked',st.show[k]);navHtml()}});
+}
+function go(r,sub){
+  route=r;
+  if(sub){var s=SUBS.filter(function(x){return x.id===sub})[0];if(s)curSub[s.m]=sub}
+  var qq=$('#q');if(qq){qq.value='';$('#sres').hidden=true}
+  draw();window.scrollTo(0,0);
+}
+document.addEventListener('click',function(e){
+  var g=e.target.closest&&e.target.closest('[data-go]');
+  if(g&&st.user){go(g.dataset.go,g.dataset.sub)}
+});
+
+/* ---------- masuk dan keluar ---------- */
+function login(role){
+  var nm=$('#nm'),v=nm.value.trim();
+  if(!v){$('#nm-err').hidden=false;nm.focus();return}
+  $('#nm-err').hidden=true;
+  st.user={name:v.slice(0,40),role:role};save();
+  route=role==='guru'?'g-dash':'home';
+  draw();window.scrollTo(0,0);
+}
+$('#in-s').onclick=function(){login('siswa')};
+$('#in-g').onclick=function(){login('guru')};
+$('#nm').addEventListener('keydown',function(e){if(e.key==='Enter')login('siswa')});
+$('#q').addEventListener('input',function(){
+  var v=this.value.trim().toLowerCase(),box=$('#sres');
+  if(!v){box.hidden=true;return}
+  var r=SUBS.filter(function(x){return st.show[x.m]!==false&&(x.title+' '+x.goal+' '+x.text.join(' ')+' '+x.formulas.join(' ')).toLowerCase().indexOf(v)>=0});
+  box.innerHTML=r.length?r.map(function(x){return '<button type="button" data-go="'+x.m+'" data-sub="'+x.id+'">'+esc(x.id+' '+x.title)+'<small>'+esc(x.goal)+'</small></button>'}).join(''):'<button type="button" disabled>Tidak ada materi yang cocok<small>Coba kata lain, mis. limit atau turunan</small></button>';
+  box.hidden=false;
+});
+$('#logout').onclick=function(){st.user=null;save();$('#nm').value='';draw()};
+draw();
+})();
+</script>
+
+</body>
+</html>
