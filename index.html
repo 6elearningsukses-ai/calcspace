@@ -89,12 +89,13 @@ function isMath(t) {
   for (i = 0; i < L.length; i++) if (L[i].length > 1 && !FN[L[i]]) return false;
   return true;
 }
-function strong(R) {
+function strong(R, nums) {
   if (!/[A-Za-z0-9]/.test(R)) return false;
-  if (/^[−+]?[\d.,]+$/.test(R)) return false;
+  if (/^\(.*;.*\)$/.test(R)) return true;
+  if (/^[−+]?[\d.,]+$/.test(R)) return !!nums;
   return /[A-Za-z²³⁴⁵⁶⁷⁸⁹ⁿ′√→−=+*\/^<>≈≠≤≥|±×π]/.test(R);
 }
-function runs(txt) {
+function runs(txt, nums) {
   var re = /(\s*)(\S+)/g, m, items = [], last = 0, out = [], plain = '', i = 0, j, k, toks, br, R;
   while ((m = re.exec(txt))) { items.push({ ws: m[1], tok: m[2] }); last = re.lastIndex; }
   var tail = txt.slice(last);
@@ -111,7 +112,7 @@ function runs(txt) {
     j = i; toks = [];
     while (j < items.length && items[j].math) { toks.push(items[j].core); br = items[j].trail; j++; if (br) break; }
     R = toks.join(' ');
-    if (strong(R)) {
+    if (strong(R, nums)) {
       plain += items[i].ws; out.push({ t: plain });
       out.push({ m: R, src: R }); plain = items[j - 1].trail;
     } else {
@@ -123,27 +124,44 @@ function runs(txt) {
   return out;
 }
 var LIM = /\blim\s+(.{1,40}?)\s+untuk\s+([a-zA-Z])\s*→\s*(−?\d+(?:,\d+)?|[a-zA-Z])/g;
-function split(txt) {
+function numify(out) {
+  if (!out.some(function (o) { return o.m != null || o.tex != null; })) return out;
+  var res = [];
+  out.forEach(function (o) {
+    if (o.t == null) { res.push(o); return; }
+    var s = o.t, last = 0, re = /\d+(?:,\d+)?/g, m, b, a, n2;
+    while ((m = re.exec(s))) {
+      b = s.charAt(m.index - 1); a = s.charAt(re.lastIndex); n2 = s.charAt(re.lastIndex + 1);
+      if (/[\w.,\-]/.test(b) || /\w/.test(a) || ((a === '.' || a === ',') && /\d/.test(n2)) ||
+          (m.index === 0 && a === '.')) continue;
+      if (m.index > last) res.push({ t: s.slice(last, m.index) });
+      res.push({ m: m[0], src: m[0] }); last = re.lastIndex;
+    }
+    res.push({ t: s.slice(last) });
+  });
+  return res;
+}
+function split(txt, nums) {
   var out = [], last = 0, m;
   LIM.lastIndex = 0;
   while ((m = LIM.exec(txt))) {
-    out = out.concat(runs(txt.slice(last, m.index)));
+    out = out.concat(runs(txt.slice(last, m.index), nums));
     out.push({ tex: '\\lim_{' + m[2] + '\\to ' + conv(m[3]) + '} ' + conv(m[1]), src: m[0] });
     last = LIM.lastIndex;
   }
-  return out.concat(runs(txt.slice(last)));
+  return numify(out.concat(runs(txt.slice(last), nums)));
 }
 
 if (typeof document === 'undefined') { module.exports = { conv: conv, split: split }; return; }
 
 /* ---------- 3. tampil di halaman ---------- */
-var SKIP = 'svg,select,option,script,style,textarea,input,.katex,.eq,.eqsel,.pill,.score,.tile,.hbar,.top,th,td:first-child,.formula,.who,.brand,.avatar';
+var SKIP = 'svg,select,option,script,style,textarea,input,.katex,.eq,.eqsel,.pill,.score,.tile,.hbar,.top,td:first-child,.formula,.who,.brand,.avatar';
 var obs = null, busy = false;
 
 function render(tex, display) { return window.katex.renderToString(tex, { throwOnError: true, displayMode: !!display }); }
 
-function toFrag(txt) {
-  var out = split(txt);
+function toFrag(txt, nums) {
+  var out = split(txt, nums);
   if (!out.some(function (o) { return o.m != null || o.tex != null; })) return null;
   var f = document.createDocumentFragment();
   out.forEach(function (o) {
@@ -188,7 +206,7 @@ function pass() {
     while ((n = w.nextNode())) {
       if (/\S/.test(n.data) && n.parentElement && !n.parentElement.closest(SKIP)) nodes.push(n);
     }
-    nodes.forEach(function (t) { var f = toFrag(t.data); if (f && t.parentNode) t.parentNode.replaceChild(f, t); });
+    nodes.forEach(function (t) { var f = toFrag(t.data, !!t.parentElement.closest('.opt')); if (f && t.parentNode) t.parentNode.replaceChild(f, t); });
     Array.prototype.forEach.call(document.querySelectorAll('select'), selLabel);
   } finally {
     if (obs) obs.observe(document.body, { childList: true, subtree: true, characterData: true });
