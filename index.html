@@ -206,9 +206,83 @@ footer{color:var(--muted);font-size:.85rem}
 a.btn{text-decoration:none;color:inherit;display:inline-block}
 .empty{color:var(--muted);font-size:.92rem}
 math{font-size:1.12em}
+/* ===== Halaman pengenalan materi ===== */
+.intro{min-height:100vh;display:flex;align-items:center;justify-content:center;padding-block:32px}
+.intro-card{width:100%;max-width:780px;background:var(--card);border-radius:24px;box-shadow:0 18px 50px rgba(23,71,214,.16);overflow:hidden;display:flex;flex-direction:column}
+.intro-hero{position:relative;overflow:hidden;background:linear-gradient(120deg,#1238A6 0%,#1747D6 45%,#4F86FF 100%);color:#fff;padding:28px 30px;display:flex;flex-direction:column;gap:10px}
+.intro-hero::before{content:"";position:absolute;right:-70px;bottom:-120px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.10)}
+.intro-hero::after{content:"";position:absolute;left:45%;top:-90px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.07)}
+.intro-hero>*{position:relative;z-index:1}
+.intro-hero h1{font-size:clamp(1.7rem,5vw,2.4rem);font-weight:800;letter-spacing:-.01em}
+.intro-hero p{color:#E3ECFF;max-width:56ch}
+.intro-body{padding:24px 30px 28px;display:flex;flex-direction:column;gap:20px}
+.slide{display:flex;flex-direction:column;gap:14px;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide{animation:none}}
+.slide h2{font-size:1.35rem;font-weight:800}
+.slide p{color:var(--ink2);max-width:66ch}
+.quote{background:var(--soft);border-left:5px solid var(--green);padding:12px 16px;border-radius:0 12px 12px 0;font-weight:500}
+.mlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.mlist .card{flex-direction:column;gap:10px}
+.mlist .card .tx{gap:4px}
+.mlist ul{margin:4px 0 0;padding-left:1.1em;font-size:.88rem;color:var(--muted)}
+.how{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.how li{display:flex;gap:12px;align-items:flex-start;background:var(--soft);border-radius:14px;padding:12px}
+.how .n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.how b{display:block;font-size:.95rem}
+.how small{color:var(--muted);font-size:.84rem;line-height:1.4;display:block}
+.intro-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:18px}
+.dots{display:flex;gap:8px;align-items:center}
+.dots i{display:block;width:10px;height:10px;border-radius:999px;background:var(--line);transition:width .2s,background .2s}
+.dots i.on{width:28px;background:var(--blue)}
+@media (max-width:560px){.intro-hero{padding:22px 20px}.intro-body{padding:20px}}
 </style>
 </head>
 <body>
+<section class="intro" id="intro" hidden aria-label="Pengenalan materi">
+  <div class="intro-card">
+    <div class="intro-hero">
+      <span class="lab" style="color:#C9D9FF">CALCSPACE · Calculus Learning Space</span>
+      <h1 id="intro-title">Selamat datang di CALCSPACE!</h1>
+      <p id="intro-lead">Ruang belajar kalkulus yang mengajakmu melihat, mencoba, dan menemukan sendiri makna di balik setiap rumus.</p>
+    </div>
+    <div class="intro-body">
+      <div class="slide" data-slide="0">
+        <h2>Halo, penjelajah kalkulus! 👋</h2>
+        <p>Pernahkah kamu bertanya bagaimana speedometer menunjukkan kecepatan mobil tepat pada satu detik tertentu? Atau bagaimana seorang insinyur tahu kapan lintasan sebuah roket mencapai titik tertingginya? Jawaban dari pertanyaan-pertanyaan itu berawal dari dua konsep penting dalam matematika: <b>limit</b> dan <b>turunan</b>.</p>
+        <p>Di CALCSPACE, kamu tidak hanya membaca rumus. Kamu akan menggeser grafik, mengamati angka yang berubah, dan menemukan sendiri pola di baliknya, selangkah demi selangkah dan sesuai kecepatanmu sendiri.</p>
+        <p class="quote">"Matematika bukan tentang angka, tetapi tentang memahami." Mari mulai perjalanan memahami perubahan bersama-sama.</p>
+      </div>
+      <div class="slide" data-slide="1" hidden>
+        <h2>Materi yang akan kamu pelajari</h2>
+        <p>Pembelajaran di CALCSPACE terbagi menjadi dua materi yang saling berkaitan. Limit menjadi fondasi, dan turunan dibangun di atasnya.</p>
+        <div class="mlist">
+          <div class="card"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 16l4-5 4 3 6-8"/></svg></span><span class="tx"><span class="lab">Materi 1</span><h3>Limit fungsi</h3><p>Mempelajari ke mana nilai suatu fungsi menuju ketika x semakin dekat ke sebuah titik, meskipun fungsinya tidak terdefinisi tepat di titik itu.</p><ul><li>Konsep limit</li><li>Menghitung limit aljabar</li></ul></span></div>
+          <div class="card"><span class="ico g"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17c4 0 4-10 9-10s5 10 9 10"/></svg></span><span class="tx"><span class="lab">Materi 2</span><h3>Turunan fungsi</h3><p>Mempelajari laju perubahan dan gradien garis singgung kurva, serta cara memakainya untuk menentukan kapan fungsi naik, turun, atau mencapai nilai stasioner.</p><ul><li>Konsep turunan</li><li>Aturan turunan</li><li>Penerapan turunan</li></ul></span></div>
+        </div>
+      </div>
+      <div class="slide" data-slide="2" hidden>
+        <h2>Cara belajar di CALCSPACE</h2>
+        <p>Setiap sub-materi dirancang dengan alur yang sama agar kamu belajar secara bertahap dan bermakna:</p>
+        <ol class="how">
+          <li><span class="n">1</span><span><b>Jelajahi widget</b><small>Geser dan amati grafik interaktif untuk menemukan konsepnya sendiri.</small></span></li>
+          <li><span class="n">2</span><span><b>Ikuti contoh soal</b><small>Buka penyelesaian langkah demi langkah dengan tenang.</small></span></li>
+          <li><span class="n">3</span><span><b>Kerjakan latihan</b><small>Uji pemahamanmu dan baca pembahasan setiap soal.</small></span></li>
+          <li><span class="n">4</span><span><b>Selesaikan kuis akhir</b><small>Tunjukkan hasil belajarmu. Nilainya langsung terkirim ke guru.</small></span></li>
+        </ol>
+        <p class="quote">Tidak apa-apa salah saat mencoba. Setiap kesalahan adalah satu langkah lebih dekat menuju paham. Siap memulai? Yuk, masuk!</p>
+      </div>
+      <div class="intro-nav">
+        <div class="dots" id="intro-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+        <div class="btns">
+          <button class="btn" type="button" id="intro-prev" hidden>← Kembali</button>
+          <button class="btn primary" type="button" id="intro-next">Lanjut →</button>
+        </div>
+      </div>
+      <p class="fb" style="text-align:right;margin-top:-10px"><button class="link" type="button" id="intro-skip">Lewati, langsung masuk</button></p>
+    </div>
+  </div>
+</section>
 <section class="login" id="login" hidden>
   <div class="login-card">
     <svg class="wave" viewBox="0 0 180 80" aria-hidden="true"><path d="M0 18 C40 18 62 40 90 56 C116 71 146 70 180 74 L180 80 L0 80 Z" fill="#1238A6"/><path d="M0 10 C42 10 66 32 95 48 C122 63 150 60 180 64" fill="none" stroke="#2F6BFF" stroke-width="4" stroke-linecap="round"/></svg>
@@ -226,6 +300,7 @@ math{font-size:1.12em}
       <p class="err" id="s-err" hidden></p>
       <div class="btns"><button class="btn primary" id="in-s" type="button">Masuk</button></div>
       <p class="fb">Guru? <a class="link" href="#guru" id="to-g">Buka halaman guru</a></p>
+      <p class="fb"><a class="link" href="#" id="to-intro">← Lihat lagi pengenalan materi</a></p>
     </div>
     <div class="pane" id="pane-g" hidden>
       <p>Halaman ini khusus guru. Masukkan PIN guru untuk melihat jawaban siswa.</p>
@@ -789,8 +864,12 @@ function navHtml(){
 }
 function draw(){
   var app=$('#app');
-  if(!st.user){$('#login').hidden=false;$('#shell').hidden=true;pane();return}
-  $('#login').hidden=true;$('#shell').hidden=false;
+  if(!st.user){
+    $('#shell').hidden=true;
+    if(!introDone){$('#intro').hidden=false;$('#login').hidden=true;return}
+    $('#intro').hidden=true;$('#login').hidden=false;pane();return;
+  }
+  $('#intro').hidden=true;$('#login').hidden=true;$('#shell').hidden=false;
   var guru=st.user.role==='guru';
   if(!allowed(route))route=guru?'g-dash':'home';
   $('#who-name').textContent=st.user.name;
@@ -881,6 +960,32 @@ $('#q').addEventListener('input',function(){
   box.hidden=false;
 });
 $('#logout').onclick=logout;
+/* ===== Navigasi halaman pengenalan materi ===== */
+var introDone=false,introI=0;
+var INTRO_HEAD=[
+  ['Selamat datang di CALCSPACE!','Ruang belajar kalkulus yang mengajakmu melihat, mencoba, dan menemukan sendiri makna di balik setiap rumus.'],
+  ['Limit dan Turunan Fungsi','Dua konsep yang menjadi kunci untuk memahami perubahan di sekitar kita.'],
+  ['Belajar dengan caramu sendiri','Lihat, coba, pahami, lalu buktikan. Semuanya ada di satu tempat.']
+];
+function introGo(i){
+  var sl=$$('.slide'),last=sl.length-1;
+  introI=Math.max(0,Math.min(last,i));
+  sl.forEach(function(s,k){s.hidden=k!==introI});
+  $$('#intro-dots i').forEach(function(d,k){d.className=k===introI?'on':''});
+  $('#intro-title').textContent=INTRO_HEAD[introI][0];
+  $('#intro-lead').textContent=INTRO_HEAD[introI][1];
+  $('#intro-prev').hidden=introI===0;
+  $('#intro-skip').hidden=introI===last;
+  $('#intro-next').textContent=introI===last?'Masuk ke CALCSPACE →':'Lanjut →';
+}
+function introFinish(){
+  introDone=true;draw();window.scrollTo(0,0);
+  var f=location.hash==='#guru'?$('#pin'):$('#nm');if(f)f.focus();
+}
+$('#intro-next').onclick=function(){if(introI>=$$('.slide').length-1)introFinish();else{introGo(introI+1);window.scrollTo(0,0)}};
+$('#intro-prev').onclick=function(){introGo(introI-1);window.scrollTo(0,0)};
+$('#intro-skip').onclick=introFinish;
+$('#to-intro').onclick=function(e){e.preventDefault();introDone=false;introGo(0);draw();window.scrollTo(0,0)};
 (function boot(){
   if(st.user&&st.user.role==='guru'){
     try{gPin=sessionStorage.getItem(KEY+'-pin')||''}catch(e){}
@@ -1050,7 +1155,7 @@ function split(txt, nums) {
 
 
 /* ---------- 3. tampil di halaman ---------- */
-var SKIP = 'svg,select,option,script,style,textarea,input,.katex,.eq,.eqsel,.pill,.score,.tile,.hbar,.top,td:first-child,.formula,.who,.brand,.avatar,.eqpick,.nomath,.login';
+var SKIP = 'svg,select,option,script,style,textarea,input,.katex,.eq,.eqsel,.pill,.score,.tile,.hbar,.top,td:first-child,.formula,.who,.brand,.avatar,.eqpick,.nomath,.login,.intro';
 var obs = null, busy = false;
 
 function render(tex, display) { return window.katex.renderToString(tex, { throwOnError: true, displayMode: !!display, output: 'html' }); }
